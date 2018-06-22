@@ -45,9 +45,11 @@ class ScreenTimer extends React.Component {
         this.startTime = 0;
         this.vibrating = false;
         this.state = {
-            countDownCeiling: 5,
-            countDown: 5,
+            countDownCeiling: 0,
+            countDown: 0,
         }
+
+        this.countDownMoveCeiling = this.countDownMoveCeiling.bind(this);
     }
 
     componentDidMount() {
@@ -56,14 +58,17 @@ class ScreenTimer extends React.Component {
             if (this.startTime > 0) {
                 const now = new Date();
                 const diff = Math.floor(parseInt(now - this.startTime) / 1000);
-                console.log('diff:', diff);
                 const countDown = this.state.countDownCeiling - diff;
+                console.log('countDown:', countDown);
                 if (countDown >= 0) {
                     this.setState((prevState, props) => ({
                         countDown,
                     }));
                 } else {
                     this.startTime = 0;
+                    this.setState((prevState, props) => ({
+                        countDown: prevState.countDownCeiling,
+                    }));
                     this.vibrateLong();
                 }
             }
@@ -97,6 +102,14 @@ class ScreenTimer extends React.Component {
         }));
     }
 
+    // dir: 1 / -1
+    countDownMoveCeiling(dir, seconds) {
+        let ceiling = this.state.countDownCeiling + (dir * seconds);
+        if (ceiling > 0) {
+            this.countDownSetCeiling(ceiling);
+        }
+    }
+
     vibrateShort() {
         let vibs = [0, 100, 100, 100];
         Vibration.vibrate(vibs);
@@ -126,18 +139,46 @@ class ScreenTimer extends React.Component {
         }
     }
 
-    renderCountDownTime() {
-        return (
-            <Text style={ss.timerText}>
-                { this.doubleIt(Math.floor(this.state.countDown / 60)) } : { this.doubleIt(this.state.countDown % 60) }
-            </Text>
-        );
-    }
-
     render() {
         return (
             <View style={ss.box}>
-                { this.renderCountDownTime() }
+                <View style={ss.timerBox}>
+                    <View style={ss.timerCellBox}>
+                        <MyButton style={ss.ceilButton} title="▲"
+                            onPress={() => {
+                                this.countDownMoveCeiling(1, 60);
+                            }}
+                        />
+                        <Text style={ss.timerText}>
+                            { this.doubleIt(Math.floor(this.state.countDown / 60)) }
+                        </Text>
+                        <MyButton style={ss.ceilButton} title="▼"
+                            onPress={() => {
+                                this.countDownMoveCeiling(-1, 60);
+                            }}
+                        />
+                    </View>
+
+                    <Text style={ss.timerText}>
+                        :
+                    </Text>
+
+                    <View style={ss.timerCellBox}>
+                        <MyButton style={ss.ceilButton} title="▲"
+                            onPress={() => {
+                                this.countDownMoveCeiling(1, 5);
+                            }}
+                        />
+                        <Text style={ss.timerText}>
+                            { this.doubleIt(this.state.countDown % 60) }
+                        </Text>
+                        <MyButton style={ss.ceilButton} title="▼"
+                            onPress={() => {
+                                this.countDownMoveCeiling(-1, 5);
+                            }}
+                        />
+                    </View>
+                </View>
 
                 <View style={ss.ceilButtonBox}>
 
@@ -198,19 +239,17 @@ class ScreenTimer extends React.Component {
                 </View>
 
                 <View style={ss.actionButtonBox}>
-                    <MyButton style={ss.actionButton} title="Start"
+                    <MyButton style={ss.actionButtonStart} title="Start"
                         onPress={() => {
                             this.countDownStart();
                         }}
-                        color="#4080f0"
                     />
 
-                    <MyButton style={ss.actionButton} title="Stop"
+                    <MyButton style={ss.actionButtonStop} title="Stop"
                         onPress={() => {
                             this.countDownStop();
                             this.vibrateCancel();
                         }}
-                        color="#4080f0"
                     />
                 </View>
             </View>
@@ -225,6 +264,20 @@ const ss = {
         alignItems: 'center', /* flex-start, center, flex-end, stretch */
         width: '100%',
         height: '100%',
+    },
+
+    timerBox: {
+        // sub
+        flexDirection: 'row', /* row, column */
+        justifyContent: 'center',  /* flex-start, center, flex-end, space-around(两端不顶头均分), space-between(两端顶头均分) */
+        alignItems: 'center', /* flex-start, center, flex-end, stretch */
+        width: '100%',
+    },
+
+    timerCellBox: {
+        flexDirection: 'column', /* row, column */
+        justifyContent: 'center',  /* flex-start, center, flex-end, space-around(两端不顶头均分), space-between(两端顶头均分) */
+        alignItems: 'center', /* flex-start, center, flex-end, stretch */
     },
 
     timerText: {
@@ -250,7 +303,7 @@ const ss = {
     },
 
     ceilButton: {
-        backgroundColor: "#4080f0",
+        backgroundColor: "#4080c0",
         width: 50,
         height: 35,
         justifyContent: 'center',
@@ -267,9 +320,15 @@ const ss = {
         alignItems: 'center', /* flex-start, center, flex-end, stretch */
     },
 
-    actionButton: {
+    actionButtonStart: {
         width: 120,
-    }
+        backgroundColor: "#208020",
+    },
+
+    actionButtonStop: {
+        width: 120,
+        backgroundColor: "#802020",
+    },
 };
 
 export default ScreenTimer;
