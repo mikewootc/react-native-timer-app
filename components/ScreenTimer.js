@@ -6,12 +6,9 @@ import {
     Text,
     Vibration,
 } from 'react-native';
+import BackgroundTimer from 'react-native-background-timer';
 
 class ScreenTimer extends React.Component {
-    //static defaultProps = {
-    //    def1: 'value',
-    //};
-
     constructor(props) {
         super(props);
 
@@ -24,7 +21,7 @@ class ScreenTimer extends React.Component {
 
     componentDidMount() {
         console.log('componentDidMount()');
-        this.timerTask = setInterval(() => {
+        this.timerTask = BackgroundTimer.setInterval(() => {
             if (this.startTime > 0) {
                 const now = new Date();
                 const diff = Math.floor(parseInt(now - this.startTime) / 1000);
@@ -39,13 +36,13 @@ class ScreenTimer extends React.Component {
                     Vibration.vibrate([0, 500, 500, 500, 500, 500]);
                 }
             }
-        }, 1000);
+        }, 200);
     }
 
     componentWillUnmount(nextProps, nextState) {
         console.log('componentWillUnmount()');
         if (this.timerTask) {
-            clearInterval(this.timerTask);
+            BackgroundTimer.clearInterval(this.timerTask);
         }
     }
     
@@ -84,10 +81,6 @@ class ScreenTimer extends React.Component {
         );
     }
 }
-
-//ClassName.defaultProps = {
-//    dkey: 'Default'
-//}
 
 const ss = StyleSheet.create({
 });
