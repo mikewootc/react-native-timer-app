@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import {
     StyleSheet,
+    View,
     Button, 
     Text,
-    View
+    Vibration,
 } from 'react-native';
 
 class ScreenTimer extends React.Component {
@@ -16,8 +17,8 @@ class ScreenTimer extends React.Component {
 
         this.startTime = 0;
         this.state = {
-            countDownStart: 10 * 60,
-            countDown: 10 * 60,
+            countDownStart: 10,
+            countDown: 10,
         }
     }
 
@@ -29,9 +30,14 @@ class ScreenTimer extends React.Component {
                 const diff = Math.floor(parseInt(now - this.startTime) / 1000);
                 console.log('diff:', diff);
                 const countDown = this.state.countDownStart - diff;
-                this.setState((prevState, props) => ({
-                    countDown,
-                }));
+                if (countDown >= 0) {
+                    this.setState((prevState, props) => ({
+                        countDown,
+                    }));
+                } else {
+                    this.startTime = 0;
+                    Vibration.vibrate([0, 500, 500, 500, 500, 500]);
+                }
             }
         }, 1000);
     }
