@@ -8,6 +8,7 @@ import {
     Vibration,
 } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
+//import KeepAwake from 'react-native-keep-awake';
 
 class MyButton extends React.Component {
     constructor(props) {
@@ -59,20 +60,18 @@ class ScreenTimer extends React.Component {
                 const now = new Date();
                 const diff = Math.floor(parseInt(now - this.startTime) / 1000);
                 const countDown = this.state.countDownCeiling - diff;
-                console.log('countDown:', countDown);
+                if (countDown != this.state.countDown) {
+                    console.log('countDown:', countDown);
+                }
                 if (countDown >= 0) {
                     this.setState((prevState, props) => ({
                         countDown,
                     }));
                 } else {
-                    this.startTime = 0;
-                    this.setState((prevState, props) => ({
-                        countDown: prevState.countDownCeiling,
-                    }));
-                    this.vibrateLong();
+                    this.countDownTimeup();
                 }
             }
-        }, 200);
+        }, 100);
     }
 
     componentWillUnmount(nextProps, nextState) {
@@ -85,6 +84,7 @@ class ScreenTimer extends React.Component {
     countDownStart() {
         if (this.startTime == 0) {
             this.startTime = new Date();
+            //KeepAwake.activate();
         }
     }
 
@@ -93,6 +93,16 @@ class ScreenTimer extends React.Component {
         this.setState((prevState, props) => ({
             countDown: prevState.countDownCeiling,
         }));
+        //KeepAwake.deactivate();
+    }
+
+    countDownTimeup() {
+        this.startTime = 0;
+        this.setState((prevState, props) => ({
+            countDown: prevState.countDownCeiling,
+        }));
+        this.vibrateLong();
+        //KeepAwake.deactivate();
     }
 
     countDownSetCeiling(seconds) {
@@ -105,7 +115,7 @@ class ScreenTimer extends React.Component {
     // dir: 1 / -1
     countDownMoveCeiling(dir, seconds) {
         let ceiling = this.state.countDownCeiling + (dir * seconds);
-        if (ceiling > 0) {
+        if (ceiling >= 0) {
             this.countDownSetCeiling(ceiling);
         }
     }
@@ -116,8 +126,12 @@ class ScreenTimer extends React.Component {
     }
 
     vibrateLong() {
-        let vibs = [0, 500, 1000, 500];
-        Vibration.vibrate(vibs, true);
+        let vibs = [0, 500];
+        for (let i = 0; i < 10; i++) {
+            vibs.push(500);
+            vibs.push(500);
+        }
+        Vibration.vibrate(vibs);
         this.vibrating = true;
         BackgroundTimer.setTimeout(() => {
             if (this.vibrating) {
@@ -247,8 +261,8 @@ class ScreenTimer extends React.Component {
 
                     <MyButton style={ss.actionButtonStop} title="Stop"
                         onPress={() => {
-                            this.countDownStop();
                             this.vibrateCancel();
+                            this.countDownStop();
                         }}
                     />
                 </View>

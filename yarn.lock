@@ -4225,6 +4225,10 @@ react-native-background-timer@^2.0.1:
   version "2.0.1"
   resolved "http://registry.npm.taobao.org/react-native-background-timer/download/react-native-background-timer-2.0.1.tgz#ef714a4bfd28fc47cbbd335631b581cf915604a2"
 
+react-native-keep-awake@^3.0.1:
+  version "3.0.1"
+  resolved "http://registry.npm.taobao.org/react-native-keep-awake/download/react-native-keep-awake-3.0.1.tgz#916652b039732a93e0b6b6077e8905fe7e74abea"
+
 react-native@0.55.4:
   version "0.55.4"
   resolved "http://registry.npm.taobao.org/react-native/download/react-native-0.55.4.tgz#eecffada3750a928e2ddd07cf11d857ae9751c30"
