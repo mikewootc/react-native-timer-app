@@ -10,7 +10,7 @@ import {
     Vibration,
 } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
-//import KeepAwake from 'react-native-keep-awake';
+import KeepAwake from 'react-native-keep-awake';
 import Tts from 'react-native-tts';
 
 class MyButton extends React.Component {
@@ -77,7 +77,7 @@ class ScreenTimer extends React.Component {
                     const diff = Math.floor(parseInt(now - this.startTime) / 1000);
                     const countDown = this.state.countDownCeiling - diff;
                     if (countDown != this.state.countDown) {
-                        console.log('countDown:', countDown);
+                        console.log('countDown: ' + Math.floor(countDown / 60) + ':' + this.doubleIt(Math.floor(countDown % 60)));
                         if (this.periodPrompt) {
                             // prompt periodically by vibration
                             let quarter = Math.floor(this.state.countDownCeiling / 4);
@@ -91,7 +91,7 @@ class ScreenTimer extends React.Component {
                             if (countDown != 0 && Math.floor(countDown) % 60 === 0) {
                                 let minute = '' + (Math.floor(countDown) / 60);
                                 console.log('##### Tts.speak:', minute);
-                                Tts.speak(minute);
+                                Tts.speak(minute + ' 分钟');
                             }
                         }
                     }
@@ -112,7 +112,7 @@ class ScreenTimer extends React.Component {
         if (this.startTime == 0) {
             this.startTime = new Date();
             this.periodPrompt = periodPrompt;
-            //KeepAwake.activate();
+            KeepAwake.activate();
         }
     }
 
@@ -122,7 +122,7 @@ class ScreenTimer extends React.Component {
         this.setState((prevState, props) => ({
             countDown: prevState.countDownCeiling,
         }));
-        //KeepAwake.deactivate();
+        KeepAwake.deactivate();
     }
 
     countDownTimeup() {
@@ -132,7 +132,7 @@ class ScreenTimer extends React.Component {
             countDown: prevState.countDownCeiling,
         }));
         this.vibrateLong();
-        //KeepAwake.deactivate();
+        KeepAwake.deactivate();
     }
 
     countDownSetCeiling(seconds) {
