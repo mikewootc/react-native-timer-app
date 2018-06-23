@@ -1,3 +1,5 @@
+'use strict';
+
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -55,23 +57,7 @@ class ScreenTimer extends React.Component {
 
     componentDidMount() {
         console.log('componentDidMount()');
-        this.timerTask = BackgroundTimer.setInterval(() => {
-            if (this.startTime > 0) {
-                const now = new Date();
-                const diff = Math.floor(parseInt(now - this.startTime) / 1000);
-                const countDown = this.state.countDownCeiling - diff;
-                if (countDown != this.state.countDown) {
-                    console.log('countDown:', countDown);
-                }
-                if (countDown >= 0) {
-                    this.setState((prevState, props) => ({
-                        countDown,
-                    }));
-                } else {
-                    this.countDownTimeup();
-                }
-            }
-        }, 100);
+        this.countDownTask();
     }
 
     componentWillUnmount(nextProps, nextState) {
@@ -80,7 +66,37 @@ class ScreenTimer extends React.Component {
             BackgroundTimer.clearInterval(this.timerTask);
         }
     }
-    
+
+    countDownTask() {
+        if (!this.timerTask) {
+            this.timerTask = BackgroundTimer.setInterval(() => {
+                if (this.startTime > 0) {
+                    const now = new Date();
+                    const diff = Math.floor(parseInt(now - this.startTime) / 1000);
+                    const countDown = this.state.countDownCeiling - diff;
+                    if (countDown != this.state.countDown) {
+                        console.log('countDown:', countDown);
+                        // prompt periodically
+                        let quarter = Math.floor(this.state.countDownCeiling / 4);
+                        let promptPoints = [quarter, quarter * 2, quarter * 3];
+                        console.log('promptPoints:', promptPoints);
+                        if (promptPoints.indexOf(countDown) >= 0) {
+                            console.log('##### vibrateShort');
+                            this.vibrateShort();
+                        }
+                    }
+                    if (countDown >= 0) {
+                        this.setState((prevState, props) => ({
+                            countDown,
+                        }));
+                    } else {
+                        this.countDownTimeup();
+                    }
+                }
+            }, 100);
+        }
+    }
+
     countDownStart() {
         if (this.startTime == 0) {
             this.startTime = new Date();
@@ -121,7 +137,7 @@ class ScreenTimer extends React.Component {
     }
 
     vibrateShort() {
-        let vibs = [0, 100, 100, 100];
+        let vibs = [0, 300, 100, 300];
         Vibration.vibrate(vibs);
     }
 
