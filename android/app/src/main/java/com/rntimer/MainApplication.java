@@ -3,6 +3,7 @@ package com.rntimer;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import net.no_mad.tts.TextToSpeechPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,6 +26,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new TextToSpeechPackage(),
             new KCKeepAwakePackage(),
             new BackgroundTimerPackage()
       );

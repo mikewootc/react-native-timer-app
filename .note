@@ -1,5 +1,7 @@
 * Vibrate
 * react-native-background-timer : BackgroundTimer
-* <activity
-    android:name=".MainActivity"
-    android:launchMode="singleTop"
+* singleTop (in AndroidManifest.xml):
+    <activity
+        android:name=".MainActivity"
+        android:launchMode="singleTop"
+* react-native-tts

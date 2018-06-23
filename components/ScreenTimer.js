@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 //import KeepAwake from 'react-native-keep-awake';
+import Tts from 'react-native-tts';
 
 class MyButton extends React.Component {
     constructor(props) {
         super(props);
+        Tts.setDefaultLanguage('zh-CN');
     }
 
     render() {
@@ -46,6 +48,7 @@ class ScreenTimer extends React.Component {
         super(props);
 
         this.startTime = 0;
+        this.periodPrompt = false;
         this.vibrating = false;
         this.state = {
             countDownCeiling: 0,
@@ -76,13 +79,21 @@ class ScreenTimer extends React.Component {
                     const countDown = this.state.countDownCeiling - diff;
                     if (countDown != this.state.countDown) {
                         console.log('countDown:', countDown);
-                        // prompt periodically
-                        let quarter = Math.floor(this.state.countDownCeiling / 4);
-                        let promptPoints = [quarter, quarter * 2, quarter * 3];
-                        console.log('promptPoints:', promptPoints);
-                        if (promptPoints.indexOf(countDown) >= 0) {
-                            console.log('##### vibrateShort');
-                            this.vibrateShort();
+                        if (this.periodPrompt) {
+                            // prompt periodically by vibration
+                            let quarter = Math.floor(this.state.countDownCeiling / 4);
+                            let promptPoints = [quarter, quarter * 2, quarter * 3];
+                            if (promptPoints.indexOf(countDown) >= 0) {
+                                console.log('##### vibrateShort');
+                                this.vibrateShort();
+                            }
+
+                            // prompt by voice at every minute
+                            if (countDown != 0 && Math.floor(countDown) % 60 === 0) {
+                                let minute = '' + (Math.floor(countDown) / 60);
+                                console.log('##### Tts.speak:', minute);
+                                Tts.speak(minute);
+                            }
                         }
                     }
                     if (countDown >= 0) {
@@ -97,15 +108,18 @@ class ScreenTimer extends React.Component {
         }
     }
 
-    countDownStart() {
+    // periodPrompt: true: prompt(vibrate at quarter and voice at every minute); false: not prompt
+    countDownStart(periodPrompt) {
         if (this.startTime == 0) {
             this.startTime = new Date();
+            this.periodPrompt = periodPrompt;
             //KeepAwake.activate();
         }
     }
 
     countDownStop() {
         this.startTime = 0;
+        this.periodPrompt = false;
         this.setState((prevState, props) => ({
             countDown: prevState.countDownCeiling,
         }));
@@ -114,6 +128,7 @@ class ScreenTimer extends React.Component {
 
     countDownTimeup() {
         this.startTime = 0;
+        this.periodPrompt = false;
         this.setState((prevState, props) => ({
             countDown: prevState.countDownCeiling,
         }));
@@ -271,7 +286,13 @@ class ScreenTimer extends React.Component {
                 <View style={ss.actionButtonBox}>
                     <MyButton style={ss.actionButtonStart} title="Start"
                         onPress={() => {
-                            this.countDownStart();
+                            this.countDownStart(false);
+                        }}
+                    />
+
+                    <MyButton style={ss.actionButtonStart} title="StartP"
+                        onPress={() => {
+                            this.countDownStart(true);
                         }}
                     />
 
@@ -351,12 +372,12 @@ const ss = {
     },
 
     actionButtonStart: {
-        width: 120,
+        width: '30%',
         backgroundColor: "#208020",
     },
 
     actionButtonStop: {
-        width: 120,
+        width: '30%',
         backgroundColor: "#802020",
     },
 };
