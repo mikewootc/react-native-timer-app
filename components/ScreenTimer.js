@@ -136,10 +136,12 @@ class ScreenTimer extends React.Component {
     }
 
     countDownSetCeiling(seconds) {
-        this.setState((prevState, props) => ({
-            countDownCeiling: seconds,
-            countDown: seconds,
-        }));
+        if (!this.startTime) {
+            this.setState((prevState, props) => ({
+                countDownCeiling: seconds,
+                countDown: seconds,
+            }));
+        }
     }
 
     // dir: 1 / -1
@@ -372,11 +374,13 @@ const ss = {
 
     actionButtonStart: {
         width: '30%',
+        height: 48,
         backgroundColor: "#208020",
     },
 
     actionButtonStop: {
         width: '30%',
+        height: 48,
         backgroundColor: "#802020",
     },
 };
