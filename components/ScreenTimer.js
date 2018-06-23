@@ -16,7 +16,6 @@ import Tts from 'react-native-tts';
 class MyButton extends React.Component {
     constructor(props) {
         super(props);
-        Tts.setDefaultLanguage('zh-CN');
     }
 
     render() {
